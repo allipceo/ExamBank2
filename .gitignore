@@ -1,0 +1,12 @@
+# Ignore sensitive data and backups
+/data/*.xlsx
+/backup/*.xlsx
+
+# Ignore documentation and master plans
+*.md
+*.txt
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
