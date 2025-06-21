@@ -26,6 +26,25 @@ console.log("--- [High-Priority] 협업체계 2.1 규칙 엔진 로딩 ---");
 
 // --- START: 시스템 레벨 최상위 규칙 ---
 
+const ruleInformationHierarchy = {
+    name: "Rule-CRITICAL-InformationHierarchy",
+    priority: 0, // 시스템상 가장 먼저 실행되는 최상위 메타 규칙
+    condition: (fact) => fact.event === 'information_request' || fact.event === 'task_start',
+    action: (fact) => {
+        const message = `
+[!!! 최상위 원칙 : 정보 계층(Source of Truth) 확인 !!!]
+'${fact.author}'는 응답 생성 전, 다음 정보 계층을 반드시 따른다:
+- Tier 0 (절대적 진실): 사용자가 제공한 실시간 정보 (이미지, 로그, 직접 명령)
+- Tier 1 (시스템 규칙): rules.js
+- Tier 2 (휘발성 상태 정보): memorybank.js
+- Tier 3 (정적 참고 자료): .md 파일, 과거 대화
+*정보 충돌 시 Tier 0 정보가 없다면, 반드시 사용자에게 최신 정보 확인을 요청한다.*
+(근거: 대시보드 오인 실수 재발 방지책)
+`;
+        console.warn(message); // 경고 수준으로 중요도 강조
+    }
+};
+
 const ruleSystemCommandProtocol = {
     name: "Rule-SYSTEM-CommandProtocol",
     priority: 1, // 가장 높은 우선순위
@@ -100,6 +119,7 @@ const ruleCriticalMandatoryLogging = {
 
 // --- END: 최우선 규칙 ---
 
+collaborationEngine.addRule(ruleInformationHierarchy);
 collaborationEngine.addRule(ruleSystemCommandProtocol);
 collaborationEngine.addRule(ruleUltimateSourceOfTruth);
 collaborationEngine.addRule(ruleProtectMainBranch);
@@ -109,6 +129,10 @@ collaborationEngine.addRule(ruleCriticalNoArbitraryChange);
 collaborationEngine.addRule(ruleCriticalMandatoryLogging);
 
 // ... (기존 규칙들도 필요하다면 여기에 추가)
+
+console.log("\n--- [시뮬레이션] 정보 요청 시 최상위 원칙 확인 ---");
+const fact_info = { event: 'information_request', author: '서대리' };
+collaborationEngine.evaluate(fact_info);
 
 console.log("\n--- [시뮬레이션] 업무 시작 시 최상위 원칙 확인 ---");
 const fact0 = { event: 'task_start', author: '서대리' };
