@@ -45,6 +45,20 @@ const ruleInformationHierarchy = {
     }
 };
 
+const ruleFactCheckFirst = {
+    name: "Rule-META-FactCheckFirst",
+    priority: 1, // 정보 계층 확인 직후 실행되는 메타 규칙
+    condition: (fact) => fact.event === 'problem_report', // 사용자가 문제를 보고했을 때
+    action: (fact) => {
+        const message = `
+[!!! 최상위 해결 원칙 : 사실 확인 우선 !!!]
+'${fact.author}'는 '${fact.problem}' 문제 해결 제안 전, 관련 공식 문서(Official Documentation)나 신뢰할 수 있는 정보 소스를 통해 '가설'이 아닌 '사실'에 기반한 해결책을 제시해야 한다.
+(근거: GitHub Pages 404 배포 실패 사태 교훈)
+`;
+        console.error(message); // 오류 수준으로 중요도 강조하여 반드시 주목하도록 함
+    }
+};
+
 const ruleSystemCommandProtocol = {
     name: "Rule-SYSTEM-CommandProtocol",
     priority: 1, // 가장 높은 우선순위
@@ -120,6 +134,7 @@ const ruleCriticalMandatoryLogging = {
 // --- END: 최우선 규칙 ---
 
 collaborationEngine.addRule(ruleInformationHierarchy);
+collaborationEngine.addRule(ruleFactCheckFirst);
 collaborationEngine.addRule(ruleSystemCommandProtocol);
 collaborationEngine.addRule(ruleUltimateSourceOfTruth);
 collaborationEngine.addRule(ruleProtectMainBranch);
@@ -129,6 +144,10 @@ collaborationEngine.addRule(ruleCriticalNoArbitraryChange);
 collaborationEngine.addRule(ruleCriticalMandatoryLogging);
 
 // ... (기존 규칙들도 필요하다면 여기에 추가)
+
+console.log("\n--- [시뮬레이션] 문제 보고 시 해결 원칙 확인 ---");
+const fact_problem = { event: 'problem_report', author: '서대리', problem: '404 오류 발생' };
+collaborationEngine.evaluate(fact_problem);
 
 console.log("\n--- [시뮬레이션] 정보 요청 시 최상위 원칙 확인 ---");
 const fact_info = { event: 'information_request', author: '서대리' };

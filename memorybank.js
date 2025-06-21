@@ -189,6 +189,25 @@ projectMemory.set("lesson_git_push_test", {
     }
 });
 
+// 13. [최신] GitHub Pages 404 배포 실패 사태 분석 및 최종 해결책 (2025-06-22)
+projectMemory.set("postmortem_pages_deployment_fail", {
+    summary: "GitHub Pages 배포 후, 404 오류가 발생하여 여러 잘못된 가설(.nojekyll, 파일 경로 등)을 시도하며 해결이 지연됨.",
+    rootCause: "GitHub Pages가 웹사이트 소스로 `/(root)` 또는 `/docs` 폴더만 인식한다는 공식 규칙을 확인하지 않고, 개인의 추측에 의존하여 문제에 접근함.",
+    keyLesson: [
+        "가설보다 사실 확인 우선: 문제 발생 시, 개인의 추측이 아닌 플랫폼의 공식 문서를 먼저 확인하여 동작 원리를 파악해야 한다.",
+        "절차 준수의 중요성: `main` 브랜치 직접 수정 시도, `feature` 브랜치 미생성 등 정해진 개발 워크플로우를 위반하여 혼란을 가중시켰다. 안전 절차는 가장 빠른 길이다."
+    ],
+    finalSolution: {
+        author: "조대표 & 서대리",
+        procedure: [
+            "1. `web` 폴더의 이름을 GitHub Pages 규칙에 맞는 `docs`로 변경.",
+            "2. `docs` 폴더 내의 `index.html`이 `docs/data` 폴더를 올바르게 참조하도록 경로 수정.",
+            "3. GitHub 저장소의 `Settings > Pages`에서 배포 소스를 `main` 브랜치의 `/docs` 폴더로 정확히 지정."
+        ],
+        principle: "플랫폼의 규칙을 먼저 이해하고, 우리의 구조를 그 규칙에 맞춰라."
+    }
+});
+
 console.log("\n--- 정보 조회 예시 ---");
 projectMemory.get("teamRoles");
 console.log("프로젝트 상태:", projectMemory.get("projectStatus"));
