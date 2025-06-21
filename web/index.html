@@ -39,12 +39,18 @@
                 <h1>보험중개사 자격시험</h1>
             </div>
             <div class="exam-grid">
-                <button class="btn">20회</button>
-                <button class="btn">21회</button>
-                <button class="btn">22회</button>
-                <button class="btn">23회</button>
-                <button id="start-exam-24" class="btn">24회</button>
-                <button class="btn">25회</button>
+                <button class="btn" data-exam-round="20">20회</button>
+                <button class="btn" data-exam-round="21">21회</button>
+                <button class="btn" data-exam-round="22">22회</button>
+                <button class="btn" data-exam-round="23">23회</button>
+                <button class="btn" data-exam-round="24">24회</button>
+                <button class="btn" data-exam-round="25">25회</button>
+                <button class="btn" data-exam-round="26">26회</button>
+                <button class="btn" data-exam-round="27">27회</button>
+                <button class="btn" data-exam-round="28">28회</button>
+                <button class="btn" data-exam-round="29">29회</button>
+                <button class="btn" data-exam-round="30">30회</button>
+                <button class="btn disabled">준비중</button>
             </div>
         </div>
 
@@ -148,7 +154,7 @@
             }
             const question = allQuestions[currentQuestionIndex];
             document.getElementById('progress-text').textContent = `문제 ${currentQuestionIndex + 1}/${allQuestions.length}`;
-            document.getElementById('question-text').innerHTML = question.question;
+            document.getElementById('question-text').innerHTML = question.fullText;
             
             // 피드백 및 다음 버튼 초기화
             document.getElementById('feedback').textContent = '';
@@ -202,8 +208,8 @@
             resultList.innerHTML = ''; // 기존 목록 초기화
             allQuestions.forEach((q, index) => {
                 const li = document.createElement('li');
-                // 'answer_text'를 여기서 사용합니다.
-                li.innerHTML = `<strong>문제 ${index + 1}. 정답: ${q.answer}번</strong><br>${q.answer_text}`;
+                // 23회 표준에 맞춰 'fullText'를 표시하고, 없는 'answer_text'는 제거합니다.
+                li.innerHTML = `<strong>문제 ${index + 1}. 정답: ${q.answer}번</strong><br><pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 1em; line-height: 1.6;">${q.fullText}</pre>`;
                 resultList.appendChild(li);
             });
 
@@ -211,9 +217,12 @@
         }
 
         // --- 이벤트 리스너 ---
-        document.getElementById('start-exam-24').addEventListener('click', async () => {
-            await loadQuestions(24);
-            if(allQuestions.length > 0) startExam();
+        document.querySelectorAll('.exam-grid .btn[data-exam-round]').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const examNumber = e.target.dataset.examRound;
+                await loadQuestions(examNumber);
+                if (allQuestions.length > 0) startExam();
+            });
         });
 
         document.querySelectorAll('.option-btn').forEach(btn => {
