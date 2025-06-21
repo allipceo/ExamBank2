@@ -1,0 +1,10 @@
+{
+    "questions": [
+        {
+            "id": 1,
+            "ibexId": "IBEX_YY_NNN_...",
+            "fullText": "문제와 보기가 원본 그대로 포함됩니다. \n① 보기 1 \n② 보기 2 \n③ 보기 3 \n④ 보기 4",
+            "answer": 1
+        }
+    ]
+} 
