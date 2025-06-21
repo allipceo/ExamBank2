@@ -111,7 +111,7 @@
         // --- 데이터 로드 함수 ---
         async function loadQuestions(examNumber) {
             try {
-                const filename = `../data/simple-data-${examNumber}-10.json`;
+                const filename = `data/simple-data-${examNumber}-10.json`;
                 const response = await fetch(filename);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

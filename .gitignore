@@ -10,3 +10,6 @@
 .DS_Store
 Thumbs.db
 
+# Custom
+docs/data/ExamBank_Master_Data_V4.0.xlsx
+
