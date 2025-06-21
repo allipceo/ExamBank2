@@ -167,6 +167,28 @@ projectMemory.set("postmortem_git_sync_fail", {
     }
 });
 
+// 12. [서대리 역량 강화] Git Push 테스트 및 신규 원칙 수립 (2025-06-21)
+projectMemory.set("lesson_git_push_test", {
+    summary: "반복적인 Git 동기화 실패 후, 서대리의 가장 기본적인 원격 저장소 쓰기(push) 능력과 한계를 검증하기 위한 투명성 테스트를 진행함.",
+    purpose: [
+        "1. 신뢰 회복: 서대리가 GitHub 서버에 코드를 올릴 수 있는 최소한의 권한과 능력이 있는지 증명.",
+        "2. 근본 원인 파악: 과거 실패의 기술적 원인을 명확히 진단.",
+        "3. 안전한 작업 규칙 수립: 테스트 과정에서 발견된 문제점을 바탕으로 재발 방지 대책 수립."
+    ],
+    findings_and_limitations: {
+        "PowerShell 명령어 실행 오류": "서대리는 PowerShell 환경에서 ';'나 '&'를 이용한 다중 명령어 실행에 반복적으로 실패함. 이는 서대리의 명백한 기술적 한계임.",
+        "`.gitignore` 파일의 영향": "`.gitignore`는 `git add` 명령을 차단할 수 있으며, 서대리는 이 메커니즘을 간과하는 실수를 보임."
+    },
+    new_principles: {
+        author: "서대리",
+        priority: "최고 등급 (Top Priority)",
+        rules: [
+            "원칙 1: [하나의 명령어만 실행] 모든 터미널 작업 시, 단 하나의 명령어만 입력하고 실행하여 예측 불가능한 오류를 원천 차단한다.",
+            "원칙 2: [Ignored 파일 우선 확인] `git add` 실패 시, 강제 옵션(-f)을 사용하기 전에 반드시 `.gitignore` 파일을 먼저 확인하여 원인을 분석하고 보고한다."
+        ]
+    }
+});
+
 console.log("\n--- 정보 조회 예시 ---");
 projectMemory.get("teamRoles");
 console.log("프로젝트 상태:", projectMemory.get("projectStatus"));

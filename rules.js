@@ -24,6 +24,22 @@ const collaborationEngine = new RuleEngine();
 
 console.log("--- [High-Priority] 협업체계 2.1 규칙 엔진 로딩 ---");
 
+// --- START: 시스템 레벨 최상위 규칙 ---
+
+const ruleSystemCommandProtocol = {
+    name: "Rule-SYSTEM-CommandProtocol",
+    priority: 1, // 가장 높은 우선순위
+    condition: (fact) => fact.event === 'terminal_command',
+    action: (fact) => {
+        if (fact.command.includes(';') || fact.command.includes('&')) {
+            throw new Error(`[!!! 시스템 오류 : 명령어 프로토콜 위반 !!!] '${fact.author}'는 PowerShell 환경에서 여러 명령어를 동시에 실행할 수 없습니다. 명령어를 하나씩 분리하여 실행하십시오. (Git Push 테스트 교훈)`);
+        }
+        console.log(`[시스템 규칙 통과] 명령어: ${fact.command}`);
+    }
+};
+
+// --- END: 시스템 레벨 최상위 규칙 ---
+
 // --- START: 최상위 업무 원칙 (조대표님 지시) ---
 
 const ruleUltimateSourceOfTruth = {
@@ -84,6 +100,7 @@ const ruleCriticalMandatoryLogging = {
 
 // --- END: 최우선 규칙 ---
 
+collaborationEngine.addRule(ruleSystemCommandProtocol);
 collaborationEngine.addRule(ruleUltimateSourceOfTruth);
 collaborationEngine.addRule(ruleProtectMainBranch);
 collaborationEngine.addRule(ruleCriticalDataSchema);
@@ -96,6 +113,16 @@ collaborationEngine.addRule(ruleCriticalMandatoryLogging);
 console.log("\n--- [시뮬레이션] 업무 시작 시 최상위 원칙 확인 ---");
 const fact0 = { event: 'task_start', author: '서대리' };
 collaborationEngine.evaluate(fact0);
+
+console.log("\n--- [시뮬레이션] 시스템 레벨 규칙 확인 ---");
+try {
+    const fact_command_ok = { event: 'terminal_command', author: '서대리', command: 'git status' };
+    collaborationEngine.evaluate(fact_command_ok);
+    const fact_command_fail = { event: 'terminal_command', author: '서대리', command: 'git status & git log' };
+    collaborationEngine.evaluate(fact_command_fail);
+} catch (e) {
+    console.error(e.message);
+}
 
 console.log("\n--- [시뮬레이션] 'main' 브랜치 직접 수정 시도 ---");
 try {
