@@ -24,6 +24,30 @@ const collaborationEngine = new RuleEngine();
 
 console.log("--- [High-Priority] 협업체계 2.1 규칙 엔진 로딩 ---");
 
+// --- START: 최상위 업무 원칙 (조대표님 지시) ---
+
+const ruleUltimateSourceOfTruth = {
+    name: "Rule-ULTIMATE-SourceOfTruth",
+    condition: (fact) => fact.event === 'task_start',
+    action: (fact) => {
+        console.warn(`[*** 최상위 업무 원칙 ***] '${fact.author}'는 업무 시작 전, 반드시 GitHub 프로젝트 보드의 'In Progress' 칸을 확인하여 현재 작업을 확정한다. memorybank나 이전 대화는 참고자료일 뿐, 프로젝트 보드가 유일한 최종 지시서이다.`);
+    }
+};
+
+// --- END: 최상위 업무 원칙 ---
+
+// --- START: Main 브랜치 보호 규칙 ---
+
+const ruleProtectMainBranch = {
+    name: "Rule-CRITICAL-ProtectMainBranch",
+    condition: (fact) => fact.event === 'file_edit' && fact.branch === 'main',
+    action: (fact) => {
+        throw new Error(`[!!! 작업 중단 : 'main' 브랜치 수정 시도 !!!] '${fact.author}'는 'main' 브랜치에서 직접 파일을 수정할 수 없습니다. 지금 즉시 'git checkout -b feature/작업명' 명령으로 새 브랜치를 생성한 후, 그곳에서 작업을 진행하십시오. 'main' 브랜치는 신성 불가침 영역입니다.`);
+    }
+};
+
+// --- END: Main 브랜치 보호 규칙 ---
+
 // --- START: 20회 연동 실패 교훈 기반 최우선 규칙 ---
 
 const ruleCriticalDataSchema = {
@@ -60,12 +84,26 @@ const ruleCriticalMandatoryLogging = {
 
 // --- END: 최우선 규칙 ---
 
+collaborationEngine.addRule(ruleUltimateSourceOfTruth);
+collaborationEngine.addRule(ruleProtectMainBranch);
 collaborationEngine.addRule(ruleCriticalDataSchema);
 collaborationEngine.addRule(ruleCriticalFlexibleLoading);
 collaborationEngine.addRule(ruleCriticalNoArbitraryChange);
 collaborationEngine.addRule(ruleCriticalMandatoryLogging);
 
 // ... (기존 규칙들도 필요하다면 여기에 추가)
+
+console.log("\n--- [시뮬레이션] 업무 시작 시 최상위 원칙 확인 ---");
+const fact0 = { event: 'task_start', author: '서대리' };
+collaborationEngine.evaluate(fact0);
+
+console.log("\n--- [시뮬레이션] 'main' 브랜치 직접 수정 시도 ---");
+try {
+    const fact_main_edit = { event: 'file_edit', author: '서대리', branch: 'main' };
+    collaborationEngine.evaluate(fact_main_edit);
+} catch (e) {
+    console.error(e.message);
+}
 
 console.log("\n--- [최우선] '20회 연동 실패' 방지 시뮬레이션 ---");
 

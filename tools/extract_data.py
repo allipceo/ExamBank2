@@ -36,23 +36,25 @@ def extract_data(exam_round, num_questions=10):
             print(f"오류: {exam_round}회차에 해당하는 데이터를 찾을 수 없습니다.")
             return
 
-        # --- 3. JSON 구조로 변환 ---
-        # RULE에 명시된 표준 필드명 사용: id, question, answer, answer_text
+        # --- 3. JSON 구조로 변환 (23회차 포맷 기준) ---
+        # "23회와 같은 포멧으로 진행" 지시에 따라 구조를 완전히 일치시킴
         questions_data = []
-        for index, row in target_df.iterrows():
+        for index, (df_index, row) in enumerate(target_df.iterrows(), 1):
             questions_data.append({
-                "id": row['IBEX_ID'],
-                "question": row['문제+보기'],  # '문제+보기' 원본 데이터가 있는 컬럼
-                "answer": row['정답'],
-                "answer_text": row['키워드'] # '정답문장' 대신 '키워드' 컬럼 사용
+                "id": index, # 1부터 시작하는 숫자 ID
+                "ibexId": row['IBEX_ID'],
+                "fullText": row['문제+보기'],  # '문제+보기' 원본 데이터가 있는 컬럼
+                "answer": int(row['정답']) # 정수형으로 변환하여 저장
+                # 'answer_text' 필드는 23회 기준에 없으므로 제외
             })
             
         # --- 4. JSON 파일로 저장 ---
-        # 최상위 레벨이 배열(Array)인 구조로 저장
+        # 최상위가 {"questions": [...]} 인 객체 구조로 저장
+        output_data = {"questions": questions_data}
         with open(output_filepath, 'w', encoding='utf-8') as f:
-            json.dump(questions_data, f, ensure_ascii=False, indent=4)
+            json.dump(output_data, f, ensure_ascii=False, indent=4)
             
-        print(f"성공: {output_filename} 파일이 'data' 폴더에 생성되었습니다. ({len(questions_data)}개 문제)")
+        print(f"성공: {output_filename} 파일이 'data' 폴더에 생성되었습니다. ({len(questions_data)}개 문제) - 23회 포맷 적용 완료")
 
     except FileNotFoundError:
         print(f"오류: 엑셀 파일을 찾을 수 없습니다. 경로를 확인하세요: {excel_file_path}")
