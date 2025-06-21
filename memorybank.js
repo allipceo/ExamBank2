@@ -146,6 +146,27 @@ projectMemory.set("phase_3_plan", {
     ]
 });
 
+// 11. [최신] Git 동기화 실패 사태 분석 및 최종 해결책 (2025-06-21)
+projectMemory.set("postmortem_git_sync_fail", {
+    summary: "로컬 main 브랜치와 원격 main 브랜치의 이력이 충돌(diverge)하여, 모든 push/pull 명령이 거부되는 교착 상태 발생.",
+    rootCause: [
+        "1. 서대리의 'main' 브랜치 직접 수정 시도 및 잦은 Git 명령어 실수.",
+        "2. 조대표님의 원격 저장소 직접 수정(README.md 생성)과 서대리의 로컬 변경사항이 충돌.",
+        "3. 서대리가 pull, rebase 등 표준적인 해결책을 잘못 적용하여 상황을 더욱 악화시킴."
+    ],
+    keyLesson: "Git 이력이 복잡하게 꼬였을 때, 어설픈 해결 시도는 상황을 악화시킬 뿐이다. 가장 확실한 방법은 깨끗한 상태에서 다시 시작하는 것이다.",
+    finalSolution: {
+        author: "조대표",
+        procedure: [
+            "1. 모든 관련 프로그램(커서, 깃 데스크톱) 종료.",
+            "2. 문제가 된 로컬 프로젝트 폴더 완전 삭제.",
+            "3. GitHub 원격 저장소에서 'git clone'으로 프로젝트를 새로 다운로드.",
+            "4. 깨끗하게 클론된 폴더에서 작업을 재개."
+        ],
+        principle: "문제가 해결되지 않을 때는, 가장 단순하고 확실한 방법으로 되돌아가라."
+    }
+});
+
 console.log("\n--- 정보 조회 예시 ---");
 projectMemory.get("teamRoles");
 console.log("프로젝트 상태:", projectMemory.get("projectStatus"));
