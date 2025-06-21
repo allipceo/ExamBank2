@@ -148,7 +148,7 @@
             }
             const question = allQuestions[currentQuestionIndex];
             document.getElementById('progress-text').textContent = `문제 ${currentQuestionIndex + 1}/${allQuestions.length}`;
-            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('question-text').innerHTML = question.question;
             
             // 피드백 및 다음 버튼 초기화
             document.getElementById('feedback').textContent = '';
