@@ -1,5 +1,269 @@
 <!DOCTYPE html>
-<html>
-<head><title>준비중</title></head>
-<body><h1>서비스 준비중입니다</h1></body>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과목별 연습</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; margin: 0; padding: 20px; background-color: #f4f7f9; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header, .footer { padding: 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 1.8em; color: #2c3e50; }
+        .header .home-link { display: inline-block; margin-top: 15px; padding: 8px 15px; background-color: #7f8c8d; color: #fff; text-decoration: none; border-radius: 5px; font-size: 0.9em; transition: background-color 0.3s; }
+        .header .home-link:hover { background-color: #6c7a7d; }
+        .screen { padding: 20px; }
+        #home-screen .exam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px;}
+        .btn { display: block; width: 100%; padding: 15px; font-size: 1em; font-weight: bold; color: #fff; background-color: #3498db; border: none; border-radius: 5px; cursor: pointer; text-align: center; text-decoration: none; box-sizing: border-box; transition: background-color 0.3s; }
+        .btn:hover { background-color: #2980b9; }
+        .btn.disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #question-screen .progress-bar { text-align: right; margin-bottom: 10px; color: #7f8c8d; }
+        #question-screen .stats { font-weight: bold; }
+        #question-screen .question-box { margin-top: 20px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px; background-color: #fafafa; }
+        #question-screen pre { white-space: pre-wrap; word-wrap: break-word; font-size: 1.1em; line-height: 1.6; }
+        #question-screen .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        #question-screen .option-btn { background-color: #ecf0f1; color: #2c3e50; }
+        #question-screen .option-btn:hover { background-color: #dbe4e8; }
+        #question-screen .feedback { margin-top: 15px; font-weight: bold; text-align: center; }
+        .feedback.correct { color: #27ae60; }
+        .feedback.wrong { color: #c0392b; }
+        #question-screen .navigation { margin-top: 20px; display: flex; justify-content: space-between; }
+        #result-screen .result-summary { text-align: center; font-size: 1.2em; margin-bottom: 20px;}
+        #result-screen .result-list { list-style: none; padding: 0; }
+        #result-screen .result-list li { background-color: #fafafa; padding: 15px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #3498db; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 홈 화면 -->
+        <div id="home-screen" class="screen">
+            <div class="header">
+                <h1>과목별 연습</h1>
+                <a href="../../index.html" class="home-link">전체 서비스(대문)로</a>
+            </div>
+            <div class="exam-grid">
+                <button class="btn" data-subject-id="01">보험업법</button>
+                <button class="btn" data-subject-id="02">상법</button>
+                <button class="btn" data-subject-id="03">세제재무</button>
+                <button class="btn" data-subject-id="04">위험관리</button>
+                <button class="btn" data-subject-id="05">자동차보험</button>
+                <button class="btn" data-subject-id="06">특종보험</button>
+                <button class="btn" data-subject-id="07">보증보험</button>
+                <button class="btn" data-subject-id="08">연금저축</button>
+                <button class="btn" data-subject-id="09">화재보험</button>
+                <button class="btn" data-subject-id="10">해상보험</button>
+                <button class="btn" data-subject-id="11">항공우주</button>
+                <button class="btn" data-subject-id="12">재보험</button>
+            </div>
+        </div>
+
+        <!-- 문제 풀이 화면 -->
+        <div id="question-screen" class="screen" style="display:none;">
+            <div class="progress-bar">
+                <span id="progress-text"></span> | <span class="stats">정답: <span id="correct-count">0</span>개 | 오답: <span id="wrong-count">0</span>개</span>
+            </div>
+            <div class="question-box">
+                <pre id="question-text"></pre>
+            </div>
+            <div class="options">
+                <button class="btn option-btn" data-option="1">①</button>
+                <button class="btn option-btn" data-option="2">②</button>
+                <button class="btn option-btn" data-option="3">③</button>
+                <button class="btn option-btn" data-option="4">④</button>
+            </div>
+            <div id="feedback" class="feedback"></div>
+            <div class="navigation">
+                <button id="home-btn" class="btn">홈</button>
+                <button id="next-btn" class="btn" style="display:none;">다음 문제</button>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="screen" style="display:none;">
+            <div class="header">
+                <h2>시험 결과</h2>
+            </div>
+            <div id="result-summary" class="result-summary"></div>
+            <ul id="result-list"></ul>
+            <div class="footer">
+                <button id="restart-btn" class="btn">홈으로 돌아가기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let allQuestions = [];
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        // DOM 요소
+        const homeScreen = document.getElementById('home-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        // --- 화면 전환 함수 ---
+        function showScreen(screenId) {
+            homeScreen.style.display = 'none';
+            questionScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        // --- 데이터 로드 및 처리 함수 ---
+        async function loadQuestions(subjectId) {
+            try {
+                const filename = `../../data/subject-${subjectId}.json`;
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    allQuestions = data;
+                } else {
+                    throw new Error("Invalid data structure");
+                }
+                
+                console.log(`${subjectId} 과목 데이터 로드 성공:`, allQuestions);
+                return allQuestions;
+            } catch (error) {
+                console.error(`${subjectId} 과목 JSON 로딩 실패:`, error);
+                alert(`${subjectId} 과목 문제 데이터를 불러오는데 실패했습니다.`);
+                showScreen('home-screen');
+                return null;
+            }
+        }
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function selectRandomQuestions(questions, count) {
+            const shuffled = [...questions];
+            shuffleArray(shuffled);
+            return shuffled.slice(0, count);
+        }
+
+
+        // --- 시험 로직 함수 ---
+        function startExam() {
+            currentQuestions = selectRandomQuestions(allQuestions, 10);
+            if (currentQuestions.length === 0) {
+                alert("출제할 문제가 없습니다.");
+                showScreen('home-screen');
+                return;
+            }
+
+            currentQuestionIndex = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            updateStats();
+            displayQuestion();
+            showScreen('question-screen');
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                showResult();
+                return;
+            }
+            const question = currentQuestions[currentQuestionIndex];
+            document.getElementById('progress-text').textContent = `문제 ${currentQuestionIndex + 1}/${currentQuestions.length}`;
+            // 'question' 필드를 사용하도록 수정
+            document.getElementById('question-text').innerHTML = question.question; 
+            
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.style.backgroundColor = '';
+            });
+        }
+
+        function handleAnswer(selectedOption) {
+            const question = currentQuestions[currentQuestionIndex];
+            const isCorrect = (parseInt(selectedOption) === question.answer);
+            const feedbackEl = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                correctCount++;
+                feedbackEl.textContent = '정답입니다!';
+                feedbackEl.className = 'feedback correct';
+            } else {
+                wrongCount++;
+                feedbackEl.textContent = `오답입니다! (정답: ${question.answer}번)`;
+                feedbackEl.className = 'feedback wrong';
+            }
+            updateStats();
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if(parseInt(btn.dataset.option) === question.answer) {
+                    btn.style.backgroundColor = '#27ae60';
+                }
+            });
+
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('wrong-count').textContent = wrongCount;
+        }
+
+        function showResult() {
+            document.getElementById('result-summary').innerHTML = `
+                총 ${currentQuestions.length}문제 중<br>
+                <strong>정답: ${correctCount}개</strong> | <strong>오답: ${wrongCount}개</strong>
+            `;
+
+            const resultList = document.getElementById('result-list');
+            resultList.innerHTML = '';
+            currentQuestions.forEach((q, index) => {
+                const li = document.createElement('li');
+                // 'question' 필드 사용 및 'id'로 출처 표시
+                li.innerHTML = `<strong>문제 ${index + 1}. (출처: ${q.id}) 정답: ${q.answer}번</strong><br><pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 1em; line-height: 1.6;">${q.question}</pre>`;
+                resultList.appendChild(li);
+            });
+
+            showScreen('result-screen');
+        }
+
+        // --- 이벤트 리스너 ---
+        document.querySelectorAll('.exam-grid .btn[data-subject-id]').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const subjectId = e.target.dataset.subjectId;
+                await loadQuestions(subjectId);
+                if (allQuestions.length > 0) startExam();
+            });
+        });
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                handleAnswer(e.target.dataset.option);
+            });
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            currentQuestionIndex++;
+            displayQuestion();
+        });
+
+        document.getElementById('home-btn').addEventListener('click', () => {
+            showScreen('home-screen');
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            showScreen('home-screen');
+        });
+
+    </script>
+</body>
 </html>
