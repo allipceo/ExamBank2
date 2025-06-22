@@ -146,6 +146,24 @@ projectMemory.set("phase_3_plan", {
     ]
 });
 
+// 11. Key Learnings
+projectMemory.set("keyLearnings", [
+    {
+        "id": "20240622-MainPage",
+        "date": "2024-06-22",
+        "task": "메인 페이지 개발",
+        "key_learning": "GitHub 프로젝트 보드를 활용한 협업 절차를 성공적으로 수행함.",
+        "outcome": "메인 페이지에 '처음으로' 버튼이 추가되어 사용자 편의성이 증대됨. PR과 머지 프로세스를 통해 협업 절차를 성공적으로 수행함."
+    },
+    {
+        "id": "20240622-SubjectPractice",
+        "date": "2024-06-22",
+        "task": "과목별 연습 기능 개발",
+        "key_learning": "엑셀과 같은 외부 데이터 소스에서 데이터를 읽을 때, 눈에 보이지 않는 공백(whitespace)이 포함될 수 있다. 이로 인해 문자열 비교나 데이터 조회 시 예상치 못한 오류가 발생할 수 있다. Python의 `strip()` 또는 JavaScript의 `.trim()`을 사용하여 데이터를 정제하는 전처리 과정이 필수적임을 학습함.",
+        "outcome": "'과목별 연습' 신규 기능 개발에 성공함. 데이터 추출 스크립트의 디버깅 과정에서 데이터 정합성의 중요성을 파악하고, 문제 해결 능력을 향상시킴."
+    }
+]);
+
 console.log("\n--- 정보 조회 예시 ---");
 projectMemory.get("teamRoles");
 console.log("프로젝트 상태:", projectMemory.get("projectStatus"));

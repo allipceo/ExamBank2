@@ -133,6 +133,18 @@ const ruleCriticalMandatoryLogging = {
 
 // --- END: 최우선 규칙 ---
 
+// --- START: 외부 데이터 처리 규칙 ---
+
+const ruleTrimExternalData = {
+    name: "Rule-CRITICAL-TrimExternalData",
+    condition: (fact) => fact.event === 'data_processing' && (fact.source === 'excel' || fact.source === 'csv'),
+    action: (fact) => {
+        console.warn(`[중요 규칙] '${fact.author}'님, 외부 데이터(엑셀, CSV 등)에서 문자열을 읽어와 조건 비교 또는 키(key)로 사용할 때는, 반드시 문자열의 앞뒤 공백을 제거하는 .trim()과 같은 데이터 정제(Data Sanitization) 과정을 거친다. (눈에 보이지 않는 공백으로 인한 매칭 오류 방지)`);
+    }
+};
+
+// --- END: 외부 데이터 처리 규칙 ---
+
 collaborationEngine.addRule(ruleInformationHierarchy);
 collaborationEngine.addRule(ruleFactCheckFirst);
 collaborationEngine.addRule(ruleSystemCommandProtocol);
@@ -142,6 +154,7 @@ collaborationEngine.addRule(ruleCriticalDataSchema);
 collaborationEngine.addRule(ruleCriticalFlexibleLoading);
 collaborationEngine.addRule(ruleCriticalNoArbitraryChange);
 collaborationEngine.addRule(ruleCriticalMandatoryLogging);
+collaborationEngine.addRule(ruleTrimExternalData);
 
 // ... (기존 규칙들도 필요하다면 여기에 추가)
 
