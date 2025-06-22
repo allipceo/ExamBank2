@@ -9,6 +9,8 @@
         .container { max-width: 800px; margin: 0 auto; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .header, .footer { padding: 20px; text-align: center; }
         .header h1 { margin: 0; font-size: 1.8em; color: #2c3e50; }
+        .header .home-link { display: inline-block; margin-top: 15px; padding: 8px 15px; background-color: #7f8c8d; color: #fff; text-decoration: none; border-radius: 5px; font-size: 0.9em; transition: background-color 0.3s; }
+        .header .home-link:hover { background-color: #6c7a7d; }
         .screen { padding: 20px; }
         #home-screen .exam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 20px;}
         .btn { display: block; width: 100%; padding: 15px; font-size: 1em; font-weight: bold; color: #fff; background-color: #3498db; border: none; border-radius: 5px; cursor: pointer; text-align: center; text-decoration: none; box-sizing: border-box; transition: background-color 0.3s; }
@@ -37,6 +39,7 @@
         <div id="home-screen" class="screen">
             <div class="header">
                 <h1>보험중개사 자격시험</h1>
+                <a href="../../index.html" class="home-link">전체 서비스(대문)로</a>
             </div>
             <div class="exam-grid">
                 <button class="btn" data-exam-round="20">20회</button>
@@ -246,4 +249,4 @@
 
     </script>
 </body>
-</html> 
+</html>
