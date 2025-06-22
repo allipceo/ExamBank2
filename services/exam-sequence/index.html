@@ -1,1 +1,249 @@
-index file
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보험중개사 자격시험</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; margin: 0; padding: 20px; background-color: #f4f7f9; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header, .footer { padding: 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 1.8em; color: #2c3e50; }
+        .screen { padding: 20px; }
+        #home-screen .exam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 20px;}
+        .btn { display: block; width: 100%; padding: 15px; font-size: 1em; font-weight: bold; color: #fff; background-color: #3498db; border: none; border-radius: 5px; cursor: pointer; text-align: center; text-decoration: none; box-sizing: border-box; transition: background-color 0.3s; }
+        .btn:hover { background-color: #2980b9; }
+        .btn.disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #question-screen .progress-bar { text-align: right; margin-bottom: 10px; color: #7f8c8d; }
+        #question-screen .stats { font-weight: bold; }
+        #question-screen .question-box { margin-top: 20px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px; background-color: #fafafa; }
+        #question-screen pre { white-space: pre-wrap; word-wrap: break-word; font-size: 1.1em; line-height: 1.6; }
+        #question-screen .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        #question-screen .option-btn { background-color: #ecf0f1; color: #2c3e50; }
+        #question-screen .option-btn:hover { background-color: #dbe4e8; }
+        #question-screen .feedback { margin-top: 15px; font-weight: bold; text-align: center; }
+        .feedback.correct { color: #27ae60; }
+        .feedback.wrong { color: #c0392b; }
+        #question-screen .navigation { margin-top: 20px; display: flex; justify-content: space-between; }
+        #result-screen .result-summary { text-align: center; font-size: 1.2em; margin-bottom: 20px;}
+        #result-screen .result-list { list-style: none; padding: 0; }
+        #result-screen .result-list li { background-color: #fafafa; padding: 15px; border-radius: 5px; margin-bottom: 10px; border-left: 5px solid #3498db; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 홈 화면 -->
+        <div id="home-screen" class="screen">
+            <div class="header">
+                <h1>보험중개사 자격시험</h1>
+            </div>
+            <div class="exam-grid">
+                <button class="btn" data-exam-round="20">20회</button>
+                <button class="btn" data-exam-round="21">21회</button>
+                <button class="btn" data-exam-round="22">22회</button>
+                <button class="btn" data-exam-round="23">23회</button>
+                <button class="btn" data-exam-round="24">24회</button>
+                <button class="btn" data-exam-round="25">25회</button>
+                <button class="btn" data-exam-round="26">26회</button>
+                <button class="btn" data-exam-round="27">27회</button>
+                <button class="btn" data-exam-round="28">28회</button>
+                <button class="btn" data-exam-round="29">29회</button>
+                <button class="btn" data-exam-round="30">30회</button>
+                <button class="btn disabled">준비중</button>
+            </div>
+        </div>
+
+        <!-- 문제 풀이 화면 -->
+        <div id="question-screen" class="screen" style="display:none;">
+            <div class="progress-bar">
+                <span id="progress-text"></span> | <span class="stats">정답: <span id="correct-count">0</span>개 | 오답: <span id="wrong-count">0</span>개</span>
+            </div>
+            <div class="question-box">
+                <pre id="question-text"></pre>
+            </div>
+            <div class="options">
+                <button class="btn option-btn" data-option="1">①</button>
+                <button class="btn option-btn" data-option="2">②</button>
+                <button class="btn option-btn" data-option="3">③</button>
+                <button class="btn option-btn" data-option="4">④</button>
+            </div>
+            <div id="feedback" class="feedback"></div>
+            <div class="navigation">
+                <button id="home-btn" class="btn">홈</button>
+                <button id="next-btn" class="btn" style="display:none;">다음 문제</button>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="screen" style="display:none;">
+            <div class="header">
+                <h2>시험 결과</h2>
+            </div>
+            <div id="result-summary" class="result-summary"></div>
+            <ul id="result-list"></ul>
+            <div class="footer">
+                <button id="restart-btn" class="btn">홈으로 돌아가기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let allQuestions = [];
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        // DOM 요소
+        const homeScreen = document.getElementById('home-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        // --- 화면 전환 함수 ---
+        function showScreen(screenId) {
+            homeScreen.style.display = 'none';
+            questionScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        // --- 데이터 로드 함수 ---
+        async function loadQuestions(examNumber) {
+            try {
+                const filename = `../../data/simple-data-${examNumber}-10.json`;
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // 데이터 구조 유연성 확보 (20회 연동 실패 교훈 반영)
+                if (Array.isArray(data)) {
+                    allQuestions = data;
+                } else if (data && Array.isArray(data.questions)) {
+                    allQuestions = data.questions;
+                } else {
+                    throw new Error("Invalid data structure");
+                }
+                
+                console.log(`${examNumber}회차 데이터 로드 성공:`, allQuestions);
+                return allQuestions;
+            } catch (error) {
+                console.error(`${examNumber}회 JSON 로딩 실패:`, error);
+                alert(`${examNumber}회 문제 데이터를 불러오는데 실패했습니다.`);
+                showScreen('home-screen');
+                return null;
+            }
+        }
+
+        // --- 시험 로직 함수 ---
+        function startExam() {
+            currentQuestionIndex = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            updateStats();
+            displayQuestion();
+            showScreen('question-screen');
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= allQuestions.length) {
+                showResult();
+                return;
+            }
+            const question = allQuestions[currentQuestionIndex];
+            document.getElementById('progress-text').textContent = `문제 ${currentQuestionIndex + 1}/${allQuestions.length}`;
+            document.getElementById('question-text').innerHTML = question.fullText;
+            
+            // 피드백 및 다음 버튼 초기화
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('next-btn').style.display = 'none';
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.style.backgroundColor = '';
+            });
+        }
+
+        function handleAnswer(selectedOption) {
+            const question = allQuestions[currentQuestionIndex];
+            const isCorrect = (parseInt(selectedOption) === question.answer);
+            const feedbackEl = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                correctCount++;
+                feedbackEl.textContent = '정답입니다!';
+                feedbackEl.className = 'feedback correct';
+            } else {
+                wrongCount++;
+                feedbackEl.textContent = `오답입니다! (정답: ${question.answer}번)`;
+                feedbackEl.className = 'feedback wrong';
+            }
+            updateStats();
+            
+            // 모든 선택지 비활성화
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if(parseInt(btn.dataset.option) === question.answer) {
+                    btn.style.backgroundColor = '#27ae60'; // 정답 녹색 표시
+                }
+            });
+
+            // 다음 문제 버튼 표시
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('wrong-count').textContent = wrongCount;
+        }
+
+        function showResult() {
+            document.getElementById('result-summary').innerHTML = `
+                총 ${allQuestions.length}문제 중<br>
+                <strong>정답: ${correctCount}개</strong> | <strong>오답: ${wrongCount}개</strong>
+            `;
+
+            const resultList = document.getElementById('result-list');
+            resultList.innerHTML = ''; // 기존 목록 초기화
+            allQuestions.forEach((q, index) => {
+                const li = document.createElement('li');
+                // 23회 표준에 맞춰 'fullText'를 표시하고, 없는 'answer_text'는 제거합니다.
+                li.innerHTML = `<strong>문제 ${index + 1}. 정답: ${q.answer}번</strong><br><pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 1em; line-height: 1.6;">${q.fullText}</pre>`;
+                resultList.appendChild(li);
+            });
+
+            showScreen('result-screen');
+        }
+
+        // --- 이벤트 리스너 ---
+        document.querySelectorAll('.exam-grid .btn[data-exam-round]').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const examNumber = e.target.dataset.examRound;
+                await loadQuestions(examNumber);
+                if (allQuestions.length > 0) startExam();
+            });
+        });
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                handleAnswer(e.target.dataset.option);
+            });
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            currentQuestionIndex++;
+            displayQuestion();
+        });
+
+        document.getElementById('home-btn').addEventListener('click', () => {
+            showScreen('home-screen');
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            showScreen('home-screen');
+        });
+
+    </script>
+</body>
+</html> 
